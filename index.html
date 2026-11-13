@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Studio Loom — Teleprompter</title>
+  <style>body{margin:0;background:#0a0e13;color:#8b98a8;font-family:system-ui;display:flex;align-items:center;justify-content:center;height:100vh}</style>
+</head>
+<body>
+  <div id="m">Caricamento studio…</div>
+  <script>
+  (async () => {
+    try {
+      const n = 5;
+      const parts = await Promise.all(
+        Array.from({length: n}, (_, i) => fetch("p" + i + ".txt").then(r => {
+          if (!r.ok) throw new Error("part " + i + " " + r.status);
+          return r.text();
+        }))
+      );
+      const html = atob(parts.join(""));
+      document.open();
+      document.write(html);
+      document.close();
+    } catch (e) {
+      document.getElementById("m").textContent = "Errore: " + e;
+    }
+  })();
+  </script>
+</body>
+</html>
