@@ -1,31 +1,50 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Studio Loom — Teleprompter</title>
-  <style>body{margin:0;background:#0a0e13;color:#8b98a8;font-family:system-ui;display:flex;align-items:center;justify-content:center;height:100vh}</style>
-</head>
-<body>
-  <div id="m">Caricamento studio…</div>
-  <script>
-  (async () => {
-    try {
-      const n = 5;
-      const parts = await Promise.all(
-        Array.from({length: n}, (_, i) => fetch("p" + i + ".txt").then(r => {
-          if (!r.ok) throw new Error("part " + i + " " + r.status);
-          return r.text();
-        }))
-      );
-      const html = atob(parts.join(""));
-      document.open();
-      document.write(html);
-      document.close();
-    } catch (e) {
-      document.getElementById("m").textContent = "Errore: " + e;
+  <title>Studio Loom</title>
+  <style>
+    :root {
+      --bg: #0a0e13; --text: #f3f6f9; --muted: #8b98a8;
+      --accent: #3dd6c6; --danger: #ff5c7a; --line: #1e2833;
     }
-  })();
-  </script>
-</body>
-</html>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; }
+    body { display: grid; grid-template-rows: auto 1fr; height: 100%; }
+    header {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+      padding: 8px 12px; border-bottom: 1px solid var(--line); background: #0e1319;
+    }
+    header strong { font-size: 13px; color: var(--muted); }
+    button {
+      border: 1px solid var(--line); background: #151c25; color: var(--text);
+      border-radius: 9px; padding: 8px 12px; font-size: 13px; cursor: pointer;
+    }
+    button.primary { background: var(--accent); color: #04201c; border: 0; font-weight: 700; }
+    button.danger { background: var(--danger); color: #fff; border: 0; font-weight: 700; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    label.ctrl { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); }
+    label.ctrl input[type="range"] { width: 90px; }
+    #status { margin-left: auto; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+    #recDot {
+      width: 10px; height: 10px; border-radius: 50%; background: var(--danger); display: none;
+      animation: pulse 1.2s infinite;
+    }
+    #recDot.on { display: inline-block; }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255,92,122,.55); }
+      70% { box-shadow: 0 0 0 10px rgba(255,92,122,0); }
+    }
+    .workspace { display: grid; grid-template-rows: minmax(150px, 26vh) 1fr; min-height: 0; }
+    body.rec-mode .workspace { grid-template-rows: 1fr 90px; }
+    body.rec-mode .prompter-box { width: min(920px, 96%); aspect-ratio: auto; height: 100%; max-height: none; }
+    body.rec-mode #promptText { font-size: clamp(26px, 4vw, 46px) !important; }
+    body.rec-mode .site-hint, body.rec-mode #siteFrame { display: none; }
+    body.rec-mode .rec-banner { display: block; }
+    .top {
+      display: grid; grid-template-columns: 1fr minmax(140px, 200px);
+      gap: 10px; padding: 10px; min-height: 0;
+      border-bottom: 1px solid var(--line); background: #0c1117;
+    }
+    body.rec-mode .top { grid-template-columns: 1fr 150px; border-bottom-color: var(--danger); }
